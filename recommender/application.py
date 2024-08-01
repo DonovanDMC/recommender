@@ -1,9 +1,13 @@
 import os
+import shutil
 from flask import Flask, jsonify, request
 from recommender import Recommender
 
 application = Flask("recommender")
 model_path = os.environ.get("MODEL_PATH", "data/recommender.pickle")
+if not os.path.exists(model_path):
+    shutil.copyfile("data/empty.pickle", model_path)
+
 recommender = Recommender.load(model_path)
 
 @application.route("/recommend/<int:user_id>")
