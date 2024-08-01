@@ -42,13 +42,13 @@ class Recommender:
 
   def dump_favorites(self):
     query = f"""
-      SELECT
-        post_id,
-        user_id
+      SELECT favorites.post_id, favorites.user_id
       FROM favorites
-      WHERE
-        post_id IN (SELECT id FROM posts WHERE fav_count > {self.MIN_POST_FAVS})
-        AND user_id IN (SELECT id FROM users WHERE favorite_count > {self.MIN_USER_FAVS})
+      INNER JOIN posts on posts.id = favorites.post_id
+      INNER JOIN users on users.id = favorites.user_id
+      INNER JOIN user_statuses on user_statuses.user_id = users.id
+      WHERE posts.fav_count > {self.MIN_POST_FAVS}
+      AND user_statuses.favorite_count > {self.MIN_USER_FAVS}
       ORDER BY post_id DESC
       LIMIT {self.MAX_FAVS}
     """
